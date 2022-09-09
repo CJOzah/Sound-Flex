@@ -6,13 +6,11 @@ import 'package:get_it/get_it.dart';
 import 'package:sound_flex/screens/home_screen.dart';
 import 'package:sound_flex/theme/theme_provider.dart';
 import 'package:sound_flex/view_models/app_provider.dart';
-import 'package:sound_flex/view_models/audio_handler.dart';
 import 'package:sound_flex/view_models/auth_provider.dart';
 import 'package:sound_flex/view_models/manager.dart';
 import 'package:sound_flex/view_models/service_locator.dart';
 import 'components/scroll_behaviour.dart';
 import 'package:provider/provider.dart';
-import 'package:audio_service/audio_service.dart';
 
 
 class MyHttpOverrides extends HttpOverrides {

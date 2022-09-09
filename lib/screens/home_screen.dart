@@ -1,9 +1,9 @@
 // ignore_for_file: unused_local_variable
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:sound_flex/components/common.dart';
@@ -12,13 +12,10 @@ import 'package:sound_flex/components/music_widget.dart';
 import 'package:sound_flex/components/sf_gradient_splash_background.dart';
 import 'package:sound_flex/gen/assets.gen.dart';
 import 'package:sound_flex/utils/constants.dart';
+import 'package:sound_flex/utils/dialogs.dart';
 import 'package:sound_flex/utils/size_config.dart';
 import 'package:sound_flex/utils/toasts.dart';
 import 'package:sound_flex/view_models/auth_provider.dart';
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-
-import 'package:flutter/services.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:sound_flex/view_models/manager.dart';
 import '../AppUrl/app_url.dart';
 import '../utils/colors.dart';
@@ -57,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
         if (response['status'] == true) {
           // Get.offAll(() => BottomNavHost());
-          ToastService().showSuccess(context, 'Success', response['message']);
+          // ToastService().showSuccess(context, 'Success', response['message']);
         } else {
           ToastService().showError(context, 'Failed', response['message']);
         }
@@ -81,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
         if (response['status'] == true) {
           songList();
-          ToastService().showSuccess(context, 'Success', response['message']);
+          // ToastService().showSuccess(context, 'Success', response['message']);
         } else {
           ToastService().showError(context, 'Failed', response['message']);
         }
@@ -123,85 +120,152 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ToastService().showError(context, 'Failed', response['message']);
         }
         if (response['status'] == true) {
-          //  _pageManager = PageManager(context);
           _pageManager.play();
-          ToastService().showSuccess(context, 'Success', response['message']);
+          // ToastService().showSuccess(context, 'Success', response['message']);
         } else {
           ToastService().showError(context, 'Failed', response['message']);
         }
       });
     };
 
-    return SfGradientSplashBackground(
-      appColors: Colors.transparent,
-      isLoading: authProvider.loading,
-      scaffold: Scaffold(
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          )),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Gap(SizeConfig.screenWidth * 0.1),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
+    return WillPopScope(
+      onWillPop: () => Dialogs().showExitDialog(context),
+      child: SfGradientSplashBackground(
+        appColors: Colors.transparent,
+        isLoading: authProvider.loading,
+        scaffold: Scaffold(
+          body: SingleChildScrollView(
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: () async {
+                AuthProvider authProvider =
+                    Provider.of<AuthProvider>(context, listen: true);
+          
+                // ignore: prefer_function_declarations_over_variables
+                var songList = () async {
+                  final Map<String, dynamic> getSongList = {
+                    "include_deleted": false,
+                    "include_has_explicit_shared_members": false,
+                    "include_media_info": true,
+                    "include_mounted_folders": true,
+                    "include_non_downloadable_files": true,
+                    "path": "/File requests/music",
+                    "recursive": false
+                  };
+                  final Future<Map<String, dynamic>> respose =
+                      authProvider.postRequest(getSongList, AppUrl.listFolder);
+                  respose.then((response) {
+                    if (response['status'] == null) {
+                      ToastService()
+                          .showError(context, 'Failed', response['message']);
+                    }
+                    if (response['status'] == true) {
+                      // Get.offAll(() => BottomNavHost());
+                      // ToastService().showSuccess(context, 'Success', response['message']);
+                    } else {
+                      ToastService()
+                          .showError(context, 'Failed', response['message']);
+                    }
+                  });
+                };
+          
+                // ignore: prefer_function_declarations_over_variables
+                var getBearer = () async {
+                  final Map<String, dynamic> getBearerToken = {
+                    "refresh_token":
+                        "rxwUiSX2a9UAAAAAAAAAAZAC8zwG79cK9t4zRfWIkDHr44wVJZII9-q3e41odAnq",
+                    "grant_type": "refresh_token",
+                    "client_id": "hxwueslwhk1oxee",
+                    "client_secret": "3pvz3p5lse4pxqf"
+                  };
+                  final Future<Map<String, dynamic>> respose =
+                      authProvider.postRequest(getBearerToken, AppUrl.token);
+                  respose.then((response) {
+                    if (response['status'] == null) {
+                      ToastService()
+                          .showError(context, 'Failed', response['message']);
+                    }
+                    if (response['status'] == true) {
+                      songList();
+                      // ToastService().showSuccess(context, 'Success', response['message']);
+                    } else {
+                      ToastService()
+                          .showError(context, 'Failed', response['message']);
+                    }
+                  });
+                };
+          
+                getBearer();
+              },
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                  image: AssetImage("assets/images/background.jpg"),
+                  fit: BoxFit.cover,
+                )),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Sound Flex",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline4!
-                                  .copyWith(
-                                    color: AppColors.white,
+                          children: <Widget>[
+                            Gap(SizeConfig.screenWidth * 0.1),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Sound Flex",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline4!
+                                        .copyWith(
+                                          color: AppColors.white,
+                                        ),
                                   ),
-                            ),
-                            const Gap(10),
-                            Text(
-                              authProvider.songList == null
-                                  ? "0"
-                                  : "songs ${authProvider.songList!.entries!.length}",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(
-                                    color: AppColors.white,
-                                    fontSize: scaledFontSize(context, 15),
+                                  const Gap(10),
+                                  Text(
+                                    authProvider.songList == null
+                                        ? "0"
+                                        : "songs ${authProvider.songList!.entries!.length}",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                          color: AppColors.white,
+                                          fontSize: scaledFontSize(context, 15),
+                                        ),
                                   ),
+                                  const Gap(20),
+                                  Align(
+                                      alignment: Alignment.centerRight,
+                                      child: PlayButton(
+                                        isShuffle: true,
+                                        pageManager: _pageManager,
+                                        width: 50,
+                                      )),
+                                ],
+                              ),
                             ),
-                            const Gap(20),
-                            Align(
-                                alignment: Alignment.centerRight,
-                                child: PlayButton(
-                                  isShuffle: true,
-                                  pageManager: _pageManager,
-                                  width: 50,
-                                )),
+                            if (authProvider.songList != null)
+                              SongWidget(
+                                songList: authProvider.songList,
+                                pageManager: _pageManager,
+                              ),
                           ],
                         ),
                       ),
-                      if (authProvider.songList != null)
-                        SongWidget(
-                          songList: authProvider.songList,
-                          pageManager: _pageManager,
-                        ),
+                      _buildBottomBar(context, authProvider),
                     ],
                   ),
                 ),
-                _buildBottomBar(context, authProvider),
-              ],
+              ),
             ),
           ),
         ),
@@ -445,7 +509,7 @@ Widget bottomPanel(
       if (response['status'] == true) {
         //  _pageManager = PageManager(context);
         pageManager.setPlay(context);
-        ToastService().showSuccess(context, 'Success', response['message']);
+        // ToastService().showSuccess(context, 'Success', response['message']);
       } else {
         ToastService().showError(context, 'Failed', response['message']);
       }

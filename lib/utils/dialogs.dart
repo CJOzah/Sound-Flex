@@ -5,13 +5,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:provider/provider.dart';
+import 'package:sound_flex/components/custom_alerts.dart';
 import 'package:sound_flex/utils/colors.dart';
 
-import '../components/custom_alerts.dart';
+import '../view_models/auth_provider.dart';
 
 class Dialogs {
   showExitDialog(BuildContext context) {
-    // authProvider.setLoading(true);
+    AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: true);
+
+    authProvider.setLoading(true);
     SVProgressHUD.dismiss();
     showDialog(
       context: context,
@@ -25,7 +30,7 @@ class Dialogs {
             children: <Widget>[
               const SizedBox(height: 15.0),
               const Text(
-                'MembScribe',
+                'Sound Flex',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16.0,

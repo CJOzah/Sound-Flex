@@ -1,12 +1,9 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
-import 'package:sound_flex/utils/toasts.dart';
 import 'package:sound_flex/view_models/auth_provider.dart';
 
-import '../AppUrl/app_url.dart';
 
 final getIt = GetIt.instance;
 

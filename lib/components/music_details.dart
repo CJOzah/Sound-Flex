@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:sound_flex/components/sf_gradient_splash_background.dart';
 import 'package:sound_flex/gen/assets.gen.dart';
-import 'package:sound_flex/main.dart';
 import 'package:sound_flex/screens/home_screen.dart';
 import 'package:sound_flex/utils/colors.dart';
 import 'package:sound_flex/utils/size_config.dart';

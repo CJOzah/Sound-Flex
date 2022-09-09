@@ -1,11 +1,11 @@
+// ignore_for_file: avoid_print, use_key_in_widget_constructors
+
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:sound_flex/gen/assets.gen.dart';
 import 'package:sound_flex/models/song_list.dart';
 import 'package:sound_flex/utils/toasts.dart';
 
-import 'package:audio_session/audio_session.dart';
 import '../AppUrl/app_url.dart';
 import '../view_models/auth_provider.dart';
 import '../view_models/manager.dart';
@@ -14,7 +14,7 @@ class SongWidget extends StatelessWidget {
   final SongList? songList;
   final PageManager? pageManager;
 
-  SongWidget({Key? key, required this.songList, required this.pageManager})
+  const SongWidget({Key? key, required this.songList, required this.pageManager})
       : super(key: key);
 
   @override
@@ -33,7 +33,7 @@ class SongWidget extends StatelessWidget {
         if (response['status'] == true) {
           //  _pageManager = PageManager(context);
           pageManager!.setPlay(context);
-          ToastService().showSuccess(context, 'Success', response['message']);
+          // ToastService().showSuccess(context, 'Success', response['message']);
         } else {
           ToastService().showError(context, 'Failed', response['message']);
         }
@@ -82,10 +82,10 @@ class SongWidget extends StatelessWidget {
                                 children: <Widget>[
                                   Text(song.name!,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700)),
-                                  const Text("Release Year: year",
+                                  const Text("Unknown",
                                       style: TextStyle(
                                           fontSize: 13,
                                           color: Colors.grey,

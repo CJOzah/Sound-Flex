@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison, avoid_print
 
       
 import 'dart:async';
@@ -112,7 +112,6 @@ class AuthProvider extends ChangeNotifier {
         );
       }
       if (response.statusCode == 400 || response.statusCode == 401) {
-        String splitRequest = urlName.split('/').last;
         setLoading(false);
         debugPrint("Error Code: ${response.statusCode} ${response.body}");
 
