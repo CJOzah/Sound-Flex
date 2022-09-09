@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:provider/provider.dart';
 import 'package:sound_flex/utils/colors.dart';
 
 import '../components/custom_alerts.dart';

@@ -2,12 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sound_flex/screens/home_screen.dart';
 import 'package:sound_flex/theme/theme_provider.dart';
 import 'package:sound_flex/view_models/app_provider.dart';
+import 'package:sound_flex/view_models/audio_handler.dart';
 import 'package:sound_flex/view_models/auth_provider.dart';
+import 'package:sound_flex/view_models/manager.dart';
+import 'package:sound_flex/view_models/service_locator.dart';
 import 'components/scroll_behaviour.dart';
 import 'package:provider/provider.dart';
+import 'package:audio_service/audio_service.dart';
+
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -15,28 +21,36 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
 }
+final getIt = GetIt.instance;
 
-void main() {
+Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
+  await setupServiceLocator();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
-        
+        ChangeNotifierProvider(create: (_) => PageManager()),
       ],
-      child:  const MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
     return Consumer<AppProvider>(
-      builder: (BuildContext? context, AppProvider? appProvider, Widget? child) {
+      builder:
+          (BuildContext? context, AppProvider? appProvider, Widget? child) {
         return GetMaterialApp(
             key: appProvider!.key,
             debugShowCheckedModeBanner: false,

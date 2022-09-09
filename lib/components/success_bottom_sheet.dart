@@ -1,11 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
-import '../../../gen/assets.gen.dart';
 import '../../../utils/colors.dart';
-import '../../../utils/constants.dart';
 import '../../../utils/strings.dart';
 
 

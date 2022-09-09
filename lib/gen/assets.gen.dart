@@ -13,7 +13,8 @@ class $AssetsImagesGen {
   const $AssetsImagesGen();
 
   /// File path: assets/images/dashboard_icon.png
-  // AssetGenImage get barbellIcon => const AssetGenImage('assets/pngs/barbellIcon.png');
+  AssetGenImage get disc => const AssetGenImage('assets/images/disc.png');
+  AssetGenImage get background => const AssetGenImage('assets/images/background.jpg');
 }
 
 class $AssetsSvgsGen {
