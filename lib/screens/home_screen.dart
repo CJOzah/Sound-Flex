@@ -23,8 +23,6 @@ import 'package:sound_flex/view_models/manager.dart';
 import '../AppUrl/app_url.dart';
 import '../utils/colors.dart';
 
-final getIt = GetIt.instance;
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -94,9 +92,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     ambiguate(WidgetsBinding.instance)!.addObserver(this);
 
-    _pageManager = getIt<PageManager>();
-    getIt<PageManager>().init();
-    getIt<PageManager>().setPageManager(_pageManager);
+    _pageManager = PageManager();
+    _pageManager.setPageManager(_pageManager);
   }
 
   bool isPlaying = false;
@@ -108,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Release decoders and buffers back to the operating system making them
     // available for other apps to use.
     _player.dispose();
-    getIt<PageManager>().dispose();
+    _pageManager.dispose();
     super.dispose();
   }
 
@@ -226,7 +223,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     topRight: Radius.circular(20.0)),
               ),
               isScrollControlled: true,
-              builder: (builder) => const MusicDetails());
+              builder: (builder) => MusicDetails(
+                    pageManager: _pageManager,
+                  ));
         },
         child: Card(
           color: Colors.transparent,
@@ -263,12 +262,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                  getIt<PageManager>().indexSelected == null
+                                  _pageManager.indexSelected == null
                                       ? "Unknown"
                                       : authProvider
                                           .songList!
-                                          .entries![getIt<PageManager>()
-                                              .indexSelected!]
+                                          .entries![_pageManager.indexSelected!]
                                           .name!,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
@@ -277,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       fontWeight: FontWeight.w700)),
                               const Gap(10),
                               Text(
-                                  getIt<PageManager>().indexSelected == null
+                                  _pageManager.indexSelected == null
                                       ? "Unknown"
                                       : "Unknown",
                                   overflow: TextOverflow.ellipsis,
@@ -454,37 +452,32 @@ Widget bottomPanel(
     });
   };
 
-  
-void previous(PageManager pageManager,
-    BuildContext context) {
-  AuthProvider authProvider = Provider.of<AuthProvider>(context);
-  pageManager.stop();
-  if (pageManager.indexSelected! == 0) {
-    tempLink(authProvider.songList!.entries!.last.pathLower!);
-    pageManager.setIndexSelected(authProvider.songList!.entries!.length - 1);
-  } else {
-    tempLink(authProvider
-        .songList!.entries![pageManager.indexSelected! - 1].pathLower!);
-    pageManager.setIndexSelected(pageManager.indexSelected! - 1);
+  void previous(PageManager pageManager, BuildContext context) {
+    AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
+    pageManager.stop();
+    if (pageManager.indexSelected! == 0) {
+      tempLink(authProvider.songList!.entries!.last.pathLower!);
+      pageManager.setIndexSelected(authProvider.songList!.entries!.length - 1);
+    } else {
+      tempLink(authProvider
+          .songList!.entries![pageManager.indexSelected! - 1].pathLower!);
+      pageManager.setIndexSelected(pageManager.indexSelected! - 1);
+    }
   }
-}
 
-void next(PageManager pageManager,
-    BuildContext context){
-  
-                  pageManager.stop();
-                  if (authProvider.songList!.entries!.length - 1 ==
-                      pageManager.indexSelected) {
-                    tempLink(authProvider.songList!.entries![0].pathLower!);
-                    pageManager.setIndexSelected(0);
-                  } else {
-                    tempLink(authProvider.songList!
-                        .entries![pageManager.indexSelected! + 1].pathLower!);
-                    pageManager
-                        .setIndexSelected(pageManager.indexSelected! + 1);
-                  }
-}
-
+  void next(PageManager pageManager, BuildContext context) {
+    pageManager.stop();
+    if (authProvider.songList!.entries!.length - 1 ==
+        pageManager.indexSelected) {
+      tempLink(authProvider.songList!.entries![0].pathLower!);
+      pageManager.setIndexSelected(0);
+    } else {
+      tempLink(authProvider
+          .songList!.entries![pageManager.indexSelected! + 1].pathLower!);
+      pageManager.setIndexSelected(pageManager.indexSelected! + 1);
+    }
+  }
 
   return Column(children: <Widget>[
     Padding(
@@ -545,12 +538,17 @@ void next(PageManager pageManager,
                 builder: (_, value, __) {
                   switch (value) {
                     case ButtonState.loading:
-                      return Container(
-                        // margin: const EdgeInsets.all(8.0),
-                        width: 50.0,
-                        height: 50.0,
-                        color: AppColors.white,
-                        child: const CircularProgressIndicator(),
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const CircularProgressIndicator(),
+                          IconButton(
+                            icon: const Icon(Icons.pause),
+                            iconSize: 40.0,
+                            color: AppColors.primary,
+                            onPressed: pageManager.pause,
+                          ),
+                        ],
                       );
                     case ButtonState.paused:
                       return IconButton(
@@ -579,7 +577,7 @@ void next(PageManager pageManager,
                   size: 40,
                 ),
                 onPressed: () {
-                   next(pageManager, context);
+                  next(pageManager, context);
                 }),
             //  => audioManagerInstance.next()),
           ),

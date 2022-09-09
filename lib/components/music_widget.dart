@@ -47,7 +47,7 @@ class SongWidget extends StatelessWidget {
           // if (song.displayName.contains(".mp3"))
           return InkWell(
             onTap: () {
-              getIt<PageManager>().setIndexSelected(index);
+              pageManager!.setIndexSelected(index);
               print("selected index: $index");
               tempLink(song.pathLower!);
             },

@@ -7,7 +7,7 @@ GetIt getIt = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
   // services
-  getIt.registerSingleton<AudioHandler>(await initAudioService());
+  // getIt.registerSingleton<AudioHandler>(await initAudioService());
 
   // page state
   getIt.registerLazySingleton<PageManager>(() => PageManager());
