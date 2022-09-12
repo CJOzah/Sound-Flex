@@ -40,6 +40,7 @@ class SongWidget extends StatelessWidget {
       });
     };
     return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: songList!.entries!.length,
         itemBuilder: (context, index) {
