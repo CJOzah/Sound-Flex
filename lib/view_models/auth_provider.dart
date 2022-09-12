@@ -1,10 +1,9 @@
 // ignore_for_file: unnecessary_null_comparison, avoid_print
 
-      
 import 'dart:async';
-      
+
 import 'dart:convert';
-      
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -57,37 +56,39 @@ class AuthProvider extends ChangeNotifier {
         encoding: Encoding.getByName('utf-8'),
         body: splitRequest.contains("token") ? payload : jsonEncode(payload),
         headers: {
-          "Content-Type": splitRequest.contains("token") ? "application/x-www-form-urlencoded" :"application/json",
-          if(!splitRequest.contains("token")) 'Authorization':  'Bearer ${_bearer!.accessToken}',
+          "Content-Type": splitRequest.contains("token")
+              ? "application/x-www-form-urlencoded"
+              : "application/json",
+          if (!splitRequest.contains("token"))
+            'Authorization': 'Bearer ${_bearer!.accessToken}',
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        setLoading(false);
+        
         notifyListeners();
         final Map<String, dynamic> responseData = json.decode(response.body);
         debugPrint('urlName $urlName ${urlName.split('/').last}');
-        debugPrint(
-            "payload response ${response.body} status Code: ${response.statusCode}");
+        // debugPrint(
+        //     "payload response ${response.body} status Code: ${response.statusCode}");
         switch (splitRequest) {
           case 'token':
             _bearer = tokenFromJson(response.body);
-            print(bearer);
+            // print(bearer);
             return result =
                 success(true, 'Token retrieved', data: responseData);
 
           case 'list_folder':
             _songList = songListFromJson(response.body);
-            print(songList);
-            return result =
-                success(true, 'List retrieved', data: responseData);
+            // print(songList);
+            return result = success(true, 'List retrieved', data: responseData);
           case 'get_temporary_link':
             _songTempLink = songTempLinkFromJson(response.body);
-            print(songTempLink);
+            // print(songTempLink);
             return result =
                 success(true, 'Temporary link retrieved', data: responseData);
           default:
-            debugPrint("Success: ${json.decode(response.body)}");
+            // debugPrint("Success: ${json.decode(response.body)}");
             return result = success(true, responseData["message"],
                 data: responseData["message"]);
         }

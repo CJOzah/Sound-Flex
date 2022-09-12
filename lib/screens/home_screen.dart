@@ -29,11 +29,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final PageManager _pageManager;
+  List<String> errortempLinks = [];
 
   @override
   void initState() {
     AuthProvider authProvider =
         Provider.of<AuthProvider>(context, listen: false);
+
+    // ignore: prefer_function_declarations_over_variables
+    var tempLink = (String path) async {
+      final Map<String, dynamic> getTempLink = {"path": path};
+      final Future<Map<String, dynamic>> respose =
+          authProvider.postRequest(getTempLink, AppUrl.tempLink);
+      respose.then((response) async {
+        if (response['status'] == null) {
+          errortempLinks.add(path);
+          //add shimmer loading
+          ToastService().showError(context, 'Failed', response['message']);
+        }
+        if (response['status'] == true) {
+          _pageManager.setPlay(context);
+        } else {
+          errortempLinks.add(path);
+          //add shimmer loading
+          ToastService().showError(context, 'Failed', response['message']);
+        }
+      });
+    };
 
     // ignore: prefer_function_declarations_over_variables
     var songList = () async {
@@ -53,7 +75,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ToastService().showError(context, 'Failed', response['message']);
         }
         if (response['status'] == true) {
-          // Get.offAll(() => BottomNavHost());
+          authProvider.songList!.entries!.forEach((element) {
+            tempLink(element.pathLower!);
+          });
           // ToastService().showSuccess(context, 'Success', response['message']);
         } else {
           ToastService().showError(context, 'Failed', response['message']);
@@ -86,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     };
 
     getBearer();
+
     super.initState();
     ambiguate(WidgetsBinding.instance)!.addObserver(this);
 
@@ -117,16 +142,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           authProvider.postRequest(getTempLink, AppUrl.tempLink);
       respose.then((response) async {
         if (response['status'] == null) {
+          //add shimmer loading
+          errortempLinks.add(path);
           ToastService().showError(context, 'Failed', response['message']);
         }
         if (response['status'] == true) {
-          _pageManager.play();
-          // ToastService().showSuccess(context, 'Success', response['message']);
+          _pageManager.setPlay(context);
         } else {
+          //add shimmer loading
+          errortempLinks.add(path);
           ToastService().showError(context, 'Failed', response['message']);
         }
       });
     };
+
+    //if a temp link can't be gotten the error list runs
+    if (errortempLinks.isNotEmpty) {
+      for (var element in errortempLinks) {
+        tempLink(element);
+      }
+    } else {
+      authProvider.setLoading(false);
+    }
 
     return WillPopScope(
       onWillPop: () => Dialogs().showExitDialog(context),
@@ -140,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               onRefresh: () async {
                 AuthProvider authProvider =
                     Provider.of<AuthProvider>(context, listen: true);
-          
+
                 // ignore: prefer_function_declarations_over_variables
                 var songList = () async {
                   final Map<String, dynamic> getSongList = {
@@ -168,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     }
                   });
                 };
-          
+
                 // ignore: prefer_function_declarations_over_variables
                 var getBearer = () async {
                   final Map<String, dynamic> getBearerToken = {
@@ -194,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     }
                   });
                 };
-          
+
                 getBearer();
               },
               child: Container(
